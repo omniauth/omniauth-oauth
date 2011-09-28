@@ -7,25 +7,22 @@ module OmniAuth
     class OAuth
       include OmniAuth::Strategy
 
-      def initialize(app, name, consumer_key=nil, consumer_secret=nil, consumer_options={}, options={}, &block)
-        self.consumer_key = consumer_key
-        self.consumer_secret = consumer_secret
-        self.consumer_options = consumer_options
-        super
-        self.options[:open_timeout] ||= 30
-        self.options[:read_timeout] ||= 30
-        self.options[:authorize_params] = options[:authorize_params] || {}
-      end
+      args [:consumer_key, :consumer_secret]
+      option :consumer_key, nil
+      option :consumer_secret, nil
+      option :client_options, {}
+      option :open_timeout, 30
+      option :read_timeout, 30
+      option :authorize_params, {}
+
+      attr_reader :access_token
 
       def consumer
-        consumer = ::OAuth::Consumer.new(consumer_key, consumer_secret, consumer_options.merge(options[:client_options] || options[:consumer_options] || {}))
-        consumer.http.open_timeout = options[:open_timeout] if options[:open_timeout]
-        consumer.http.read_timeout = options[:read_timeout] if options[:read_timeout]
+        consumer = ::OAuth::Consumer.new(options.consumer_key, options.consumer_secret, options.client_options)
+        consumer.http.open_timeout = options.open_timeout if options.open_timeout
+        consumer.http.read_timeout = options.read_timeout if options.read_timeout
         consumer
       end
-
-      attr_reader :name
-      attr_accessor :consumer_key, :consumer_secret, :consumer_options
 
       def request_phase
         request_token = consumer.get_request_token(:oauth_callback => callback_url)
@@ -70,20 +67,19 @@ module OmniAuth
         fail!(:session_expired, e)
       end
 
-      def auth_hash
-        OmniAuth::Utils.deep_merge(super, {
-          'credentials' => {
-            'token' => @access_token.token,
-            'secret' => @access_token.secret
-          }, 'extra' => {
-            'access_token' => @access_token
-          }
-        })
+      def uid
+        access_token.token
       end
 
-      def unique_id
-        nil
+      def credentials
+        {'token' => access_token.token, 'secret' => access_token.secret}
+      end
+
+      def extra
+        {'access_token' => access_token}
       end
     end
   end
 end
+
+OmniAuth.config.add_camelization 'oauth', 'OAuth'

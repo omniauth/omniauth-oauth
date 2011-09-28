@@ -1,13 +1,22 @@
 require 'spec_helper'
 
 describe "OmniAuth::Strategies::OAuth" do
+  class MyOAuthProvider < OmniAuth::Strategies::OAuth
+    def uid
+      access_token.token
+    end
+
+    def info
+      {'name' => access_token.token}
+    end
+  end
 
   def app
     Rack::Builder.new {
       use OmniAuth::Test::PhonySession
       use OmniAuth::Builder do
-        provider :oauth, 'example.org', 'abc', 'def', :site => 'https://api.example.org'
-        provider :oauth, 'example.org_with_authorize_params', 'abc', 'def', { :site => 'https://api.example.org' }, :authorize_params => {:abc => 'def'}
+        provider MyOAuthProvider, 'abc', 'def', :client_options => {:site => 'https://api.example.org'}, :name => 'example.org'
+        provider MyOAuthProvider, 'abc', 'def', :client_options => {:site => 'https://api.example.org'}, :authorize_params => {:abc => 'def'}, :name => 'example.org_with_authorize_params'
       end
       run lambda { |env| [404, {'Content-Type' => 'text/plain'}, [env.key?('omniauth.auth').to_s]] }
     }.to_app
@@ -20,6 +29,10 @@ describe "OmniAuth::Strategies::OAuth" do
   before do
     stub_request(:post, 'https://api.example.org/oauth/request_token').
        to_return(:body => "oauth_token=yourtoken&oauth_token_secret=yoursecret&oauth_callback_confirmed=true")
+  end
+
+  it 'should add a camelization for itself' do
+    OmniAuth::Utils.camelize('oauth').should == 'OAuth'
   end
 
   describe '/auth/{name}' do
