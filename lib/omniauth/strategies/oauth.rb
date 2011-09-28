@@ -67,10 +67,6 @@ module OmniAuth
         fail!(:session_expired, e)
       end
 
-      def uid
-        access_token.token
-      end
-
       def credentials
         {'token' => access_token.token, 'secret' => access_token.secret}
       end
