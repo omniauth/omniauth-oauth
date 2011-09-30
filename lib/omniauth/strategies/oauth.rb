@@ -67,11 +67,11 @@ module OmniAuth
         fail!(:session_expired, e)
       end
 
-      def credentials
+      credentials do
         {'token' => access_token.token, 'secret' => access_token.secret}
       end
 
-      def extra
+      extra do
         {'access_token' => access_token}
       end
     end

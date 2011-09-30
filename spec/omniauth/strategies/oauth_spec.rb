@@ -2,13 +2,8 @@ require 'spec_helper'
 
 describe "OmniAuth::Strategies::OAuth" do
   class MyOAuthProvider < OmniAuth::Strategies::OAuth
-    def uid
-      access_token.token
-    end
-
-    def info
-      {'name' => access_token.token}
-    end
+    uid{ access_token.token }
+    info{ {'name' => access_token.token} }
   end
 
   def app
@@ -40,6 +35,7 @@ describe "OmniAuth::Strategies::OAuth" do
       before do
         get '/auth/example.org'
       end
+
       it 'should redirect to authorize_url' do
         last_response.should be_redirect
         last_response.headers['Location'].should == 'https://api.example.org/oauth/authorize?oauth_token=yourtoken'
