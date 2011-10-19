@@ -1,6 +1,6 @@
 # OmniAuth OAuth
 
-**Note:** This gem is designed to work with the unreleased OmniAuth 1.0
+**Note:** This gem is designed to work with the in-beta OmniAuth 1.0
 library. It will not be officially released on RubyGems.org until
 OmniAuth 1.0 is released.
 
@@ -18,7 +18,7 @@ subclass it and add a few extra methods like so:
 
     module OmniAuth
       module Strategies
-        class SomeSite
+        class SomeSite < OmniAuth::Strategies::OAuth
           # Give your strategy a name.
           option :name, "some_site"
 
