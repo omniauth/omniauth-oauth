@@ -12,6 +12,7 @@ describe "OmniAuth::Strategies::OAuth" do
       use OmniAuth::Builder do
         provider MyOAuthProvider, 'abc', 'def', :client_options => {:site => 'https://api.example.org'}, :name => 'example.org'
         provider MyOAuthProvider, 'abc', 'def', :client_options => {:site => 'https://api.example.org'}, :authorize_params => {:abc => 'def'}, :name => 'example.org_with_authorize_params'
+        provider MyOAuthProvider, 'abc', 'def', :client_options => {:site => 'https://api.example.org'}, :request_params => {:scope => 'http://foobar.example.org'}, :name => 'example.org_with_request_params'
       end
       run lambda { |env| [404, {'Content-Type' => 'text/plain'}, [env.key?('omniauth.auth').to_s]] }
     }.to_app
@@ -52,6 +53,12 @@ describe "OmniAuth::Strategies::OAuth" do
 
       it 'should set appropriate session variables' do
         session['oauth'].should == {"example.org" => {'callback_confirmed' => true, 'request_token' => 'yourtoken', 'request_secret' => 'yoursecret'}}
+      end
+
+      it 'should pass request_params to get_request_token' do
+        get '/auth/example.org_with_request_params'
+        WebMock.should have_requested(:post, 'https://api.example.org/oauth/request_token').
+           with {|req| req.body == "scope=http%3a%2f%2ffoobar.example.org" }
       end
     end
 
