@@ -14,6 +14,7 @@ module OmniAuth
       option :open_timeout, 30
       option :read_timeout, 30
       option :authorize_params, {}
+      option :request_params, {}
 
       attr_reader :access_token
 
@@ -25,7 +26,7 @@ module OmniAuth
       end
 
       def request_phase
-        request_token = consumer.get_request_token(:oauth_callback => callback_url)
+        request_token = consumer.get_request_token({:oauth_callback => callback_url}, options.request_params)
         session['oauth'] ||= {}
         session['oauth'][name.to_s] = {'callback_confirmed' => request_token.callback_confirmed?, 'request_token' => request_token.token, 'request_secret' => request_token.secret}
 
