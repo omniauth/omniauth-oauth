@@ -26,6 +26,9 @@ subclass it and add a few extra methods like so:
           # initializing your consumer from the OAuth gem.
           option :client_options, {:site => "https://api.somesite.com"}
 
+          # This is used for Sina weibo who didn't return :callback_confirmed params when get request token
+          option :callback_confirmed, true
+
           # These are called after authentication has succeeded. If
           # possible, you should try to set the UID without making
           # additional calls (if the user id is returned with the token
