@@ -10,6 +10,7 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency     'omniauth', '~> 1.0'
   gem.add_runtime_dependency     'oauth'
+  gem.add_runtime_dependency     'multi_json'
   gem.add_development_dependency 'rspec', '~> 2.6'
   gem.add_development_dependency 'webmock'
   gem.add_development_dependency 'simplecov'
