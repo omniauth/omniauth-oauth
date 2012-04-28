@@ -58,7 +58,7 @@ describe "OmniAuth::Strategies::OAuth" do
       it 'should pass request_params to get_request_token' do
         get '/auth/example.org_with_request_params'
         WebMock.should have_requested(:post, 'https://api.example.org/oauth/request_token').
-           with {|req| req.body == "scope=http%3a%2f%2ffoobar.example.org" }
+           with {|req| req.body == "scope=http%3A%2F%2Ffoobar.example.org" }
       end
     end
 
