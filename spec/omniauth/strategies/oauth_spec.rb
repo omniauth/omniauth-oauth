@@ -136,7 +136,7 @@ describe "OmniAuth::Strategies::OAuth" do
     before do
       stub_request(:post, 'https://api.example.org/oauth/access_token').
          to_return(:body => "oauth_token=yourtoken&oauth_token_secret=yoursecret")
-      get '/auth/example.org/callback', {:oauth_verifier => 'dudeman'}, {'rack.session' => {}}
+      get '/auth/example.org/callback', {:oauth_verifier => 'dudeman'}, {'rack.session' => {'oauth' => {'anotherexample' => {'callback_confirmed' => true}}}}
     end
 
     it 'should call fail! with :session_expired' do
