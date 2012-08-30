@@ -144,4 +144,18 @@ describe "OmniAuth::Strategies::OAuth" do
       last_request.env['omniauth.error.type'] = :session_expired
     end
   end
+
+  describe '/auth/{name}/callback with oauth_token and oauth_token_secret' do
+    before do
+      get '/auth/example.org/callback', {:oauth_token => 'yourtoken', :oauth_token_secret => 'soopersekret', :user_id => 123}, {'rack.session' => {}}
+    end
+
+    it 'should succeed' do
+      last_request.env['omniauth.auth']['credentials']['token'].should == 'yourtoken'
+      last_request.env['omniauth.auth']['credentials']['secret'].should == 'soopersekret'
+      last_request.env['omniauth.auth']['provider'].should == 'example.org'
+      last_request.env['omniauth.auth']['extra']['access_token'].should be_kind_of(OAuth::AccessToken)
+      last_request.env['omniauth.auth']['extra']['access_token'].params['user_id'].should == '123'
+    end
+  end
 end
