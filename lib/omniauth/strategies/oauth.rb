@@ -19,7 +19,19 @@ module OmniAuth
       attr_reader :access_token
 
       def consumer
-        consumer = ::OAuth::Consumer.new(options.consumer_key, options.consumer_secret, options.client_options)
+        if options.consumer_key.is_a?(Proc)
+          consumer_key = options.consumer_key.call(env)
+        else
+          consumer_key = options.consumer_key
+        end
+
+        if options.consumer_secret.is_a?(Proc)
+          consumer_secret = options.consumer_secret.call(env)
+        else
+          consumer_secret = options.consumer_secret
+        end
+
+        consumer = ::OAuth::Consumer.new(consumer_key, consumer_secret, options.client_options)
         consumer.http.open_timeout = options.open_timeout if options.open_timeout
         consumer.http.read_timeout = options.read_timeout if options.read_timeout
         consumer
