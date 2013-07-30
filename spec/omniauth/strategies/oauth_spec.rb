@@ -13,6 +13,10 @@ describe "OmniAuth::Strategies::OAuth" do
         provider MyOAuthProvider, 'abc', 'def', :client_options => {:site => 'https://api.example.org'}, :name => 'example.org'
         provider MyOAuthProvider, 'abc', 'def', :client_options => {:site => 'https://api.example.org'}, :authorize_params => {:abc => 'def'}, :name => 'example.org_with_authorize_params'
         provider MyOAuthProvider, 'abc', 'def', :client_options => {:site => 'https://api.example.org'}, :request_params => {:scope => 'http://foobar.example.org'}, :name => 'example.org_with_request_params'
+
+        consumer_key_proc = Proc.new{|env| 'foo'}
+        consumer_secret_proc = Proc.new{|env| 'bar'}
+        provider MyOAuthProvider, consumer_key_proc, consumer_secret_proc, :client_options => {:site => 'https://api.example.org'}, :name => 'example.org_with_proc_args'
       end
       run lambda { |env| [404, {'Content-Type' => 'text/plain'}, [env.key?('omniauth.auth').to_s]] }
     }.to_app
@@ -49,6 +53,12 @@ describe "OmniAuth::Strategies::OAuth" do
           'https://api.example.org/oauth/authorize?abc=def&oauth_token=yourtoken',
           'https://api.example.org/oauth/authorize?oauth_token=yourtoken&abc=def'
         ].should be_include(last_response.headers['Location'])
+      end
+
+      it 'should accept a proc for consumer_key and consume_secret args' do
+        OAuth::Consumer.should_receive(:new).with('foo', 'bar', an_instance_of(OmniAuth::Strategy::Options)).and_call_original
+        get '/auth/example.org_with_proc_args'
+        last_response.should be_redirect
       end
 
       it 'should set appropriate session variables' do
