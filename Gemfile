@@ -9,11 +9,3 @@ group :test do
   gem 'simplecov'
   gem 'webmock'
 end
-
-group :development, :test do
-  gem 'guard'
-  gem 'guard-rspec'
-  gem 'guard-bundler'
-  gem 'growl'
-  gem 'rb-fsevent'
-end
