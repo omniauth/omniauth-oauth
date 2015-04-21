@@ -28,7 +28,7 @@ describe "OmniAuth::Strategies::OAuth" do
   end
 
   it 'should add a camelization for itself' do
-    OmniAuth::Utils.camelize('oauth').should == 'OAuth'
+    expect(OmniAuth::Utils.camelize('oauth')).to eq('OAuth')
   end
 
   describe '/auth/{name}' do
@@ -38,26 +38,26 @@ describe "OmniAuth::Strategies::OAuth" do
       end
 
       it 'should redirect to authorize_url' do
-        last_response.should be_redirect
-        last_response.headers['Location'].should == 'https://api.example.org/oauth/authorize?oauth_token=yourtoken'
+        expect(last_response).to be_redirect
+        expect(last_response.headers['Location']).to eq('https://api.example.org/oauth/authorize?oauth_token=yourtoken')
       end
 
       it 'should redirect to authorize_url with authorize_params when set' do
         get '/auth/example.org_with_authorize_params'
-        last_response.should be_redirect
-        [
+        expect(last_response).to be_redirect
+        expect([
           'https://api.example.org/oauth/authorize?abc=def&oauth_token=yourtoken',
           'https://api.example.org/oauth/authorize?oauth_token=yourtoken&abc=def'
-        ].should be_include(last_response.headers['Location'])
+        ]).to be_include(last_response.headers['Location'])
       end
 
       it 'should set appropriate session variables' do
-        session['oauth'].should == {"example.org" => {'callback_confirmed' => true, 'request_token' => 'yourtoken', 'request_secret' => 'yoursecret'}}
+        expect(session['oauth']).to eq({"example.org" => {'callback_confirmed' => true, 'request_token' => 'yourtoken', 'request_secret' => 'yoursecret'}})
       end
 
       it 'should pass request_params to get_request_token' do
         get '/auth/example.org_with_request_params'
-        WebMock.should have_requested(:post, 'https://api.example.org/oauth/request_token').
+        expect(WebMock).to have_requested(:post, 'https://api.example.org/oauth/request_token').
            with {|req| req.body == "scope=http%3A%2F%2Ffoobar.example.org" }
       end
     end
@@ -70,7 +70,7 @@ describe "OmniAuth::Strategies::OAuth" do
       end
 
       it 'should call fail! with :service_unavailable' do
-        last_request.env['omniauth.error'].should be_kind_of(::Net::HTTPFatalError)
+        expect(last_request.env['omniauth.error']).to be_kind_of(::Net::HTTPFatalError)
         last_request.env['omniauth.error.type'] = :service_unavailable
       end
 
@@ -82,7 +82,7 @@ describe "OmniAuth::Strategies::OAuth" do
         end
 
         it 'should call fail! with :service_unavailable' do
-          last_request.env['omniauth.error'].should be_kind_of(::OpenSSL::SSL::SSLError)
+          expect(last_request.env['omniauth.error']).to be_kind_of(::OpenSSL::SSL::SSLError)
           last_request.env['omniauth.error.type'] = :service_unavailable
         end
       end
@@ -97,12 +97,12 @@ describe "OmniAuth::Strategies::OAuth" do
     end
 
     it 'should exchange the request token for an access token' do
-      last_request.env['omniauth.auth']['provider'].should == 'example.org'
-      last_request.env['omniauth.auth']['extra']['access_token'].should be_kind_of(OAuth::AccessToken)
+      expect(last_request.env['omniauth.auth']['provider']).to eq('example.org')
+      expect(last_request.env['omniauth.auth']['extra']['access_token']).to be_kind_of(OAuth::AccessToken)
     end
 
     it 'should call through to the master app' do
-      last_response.body.should == 'true'
+      expect(last_response.body).to eq('true')
     end
 
     context "bad gateway (or any 5xx) for access_token" do
@@ -113,7 +113,7 @@ describe "OmniAuth::Strategies::OAuth" do
       end
 
       it 'should call fail! with :service_unavailable' do
-        last_request.env['omniauth.error'].should be_kind_of(::Net::HTTPFatalError)
+        expect(last_request.env['omniauth.error']).to be_kind_of(::Net::HTTPFatalError)
         last_request.env['omniauth.error.type'] = :service_unavailable
       end
     end
@@ -126,7 +126,7 @@ describe "OmniAuth::Strategies::OAuth" do
       end
 
       it 'should call fail! with :service_unavailable' do
-        last_request.env['omniauth.error'].should be_kind_of(::OpenSSL::SSL::SSLError)
+        expect(last_request.env['omniauth.error']).to be_kind_of(::OpenSSL::SSL::SSLError)
         last_request.env['omniauth.error.type'] = :service_unavailable
       end
     end
@@ -140,7 +140,7 @@ describe "OmniAuth::Strategies::OAuth" do
     end
 
     it 'should call fail! with :session_expired' do
-      last_request.env['omniauth.error'].should be_kind_of(::OmniAuth::NoSessionError)
+      expect(last_request.env['omniauth.error']).to be_kind_of(::OmniAuth::NoSessionError)
       last_request.env['omniauth.error.type'] = :session_expired
     end
   end
