@@ -1,11 +1,10 @@
-# -*- encoding: utf-8 -*-
 require File.expand_path("../lib/omniauth-oauth/version", __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.authors       = ["Michael Bleigh"]
-  gem.email         = ["michael@intridea.com"]
+  gem.authors       = ["Michael Bleigh", "Erik Michaels-Ober"]
+  gem.email         = ["michael@intridea.com", "sferik@gmail.com"]
   gem.description   = "A generic OAuth (1.0/1.0a) strategy for OmniAuth."
-  gem.summary       = "A generic OAuth (1.0/1.0a) strategy for OmniAuth."
+  gem.summary       = gem.description
   gem.homepage      = "https://github.com/intridea/omniauth-oauth"
   gem.license       = "MIT"
 
@@ -19,5 +18,4 @@ Gem::Specification.new do |gem|
   gem.name          = "omniauth-oauth"
   gem.require_paths = ["lib"]
   gem.version       = OmniAuth::OAuth::VERSION
-  gem.license       = "MIT"
 end
