@@ -1,4 +1,4 @@
-require "spec_helper"
+require "helper"
 
 describe "OmniAuth::Strategies::OAuth" do
   class MyOAuthProvider < OmniAuth::Strategies::OAuth
