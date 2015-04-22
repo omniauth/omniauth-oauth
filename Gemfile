@@ -2,10 +2,10 @@ source 'http://rubygems.org'
 
 gemspec
 
-group :development, :test do
-  gem 'guard'
-  gem 'guard-rspec'
-  gem 'guard-bundler'
-  gem 'growl'
-  gem 'rb-fsevent'
+group :test do
+  gem 'rack-test'
+  gem 'rake'
+  gem 'rspec', '~> 3.2'
+  gem 'simplecov'
+  gem 'webmock'
 end
