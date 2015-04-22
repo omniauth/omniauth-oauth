@@ -24,7 +24,7 @@ module OmniAuth
         consumer
       end
 
-      def request_phase
+      def request_phase # rubocop:disable MethodLength
         request_token = consumer.get_request_token({:oauth_callback => callback_url}, options.request_params)
         session["oauth"] ||= {}
         session["oauth"][name.to_s] = {"callback_confirmed" => request_token.callback_confirmed?, "request_token" => request_token.token, "request_secret" => request_token.secret}
@@ -41,8 +41,8 @@ module OmniAuth
         fail!(:service_unavailable, e)
       end
 
-      def callback_phase
-        raise OmniAuth::NoSessionError.new("Session Expired") if session["oauth"].nil?
+      def callback_phase # rubocop:disable MethodLength
+        fail(OmniAuth::NoSessionError, "Session Expired") if session["oauth"].nil?
 
         request_token = ::OAuth::RequestToken.new(consumer, session["oauth"][name.to_s].delete("request_token"), session["oauth"][name.to_s].delete("request_secret"))
 

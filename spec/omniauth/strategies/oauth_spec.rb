@@ -2,12 +2,12 @@ require "spec_helper"
 
 describe "OmniAuth::Strategies::OAuth" do
   class MyOAuthProvider < OmniAuth::Strategies::OAuth
-    uid{ access_token.token }
-    info{ {"name" => access_token.token} }
+    uid { access_token.token }
+    info { {"name" => access_token.token} }
   end
 
   def app
-    Rack::Builder.new {
+    Rack::Builder.new do
       use OmniAuth::Test::PhonySession
       use OmniAuth::Builder do
         provider MyOAuthProvider, "abc", "def", :client_options => {:site => "https://api.example.org"}, :name => "example.org"
@@ -15,7 +15,7 @@ describe "OmniAuth::Strategies::OAuth" do
         provider MyOAuthProvider, "abc", "def", :client_options => {:site => "https://api.example.org"}, :request_params => {:scope => "http://foobar.example.org"}, :name => "example.org_with_request_params"
       end
       run lambda { |env| [404, {"Content-Type" => "text/plain"}, [env.key?("omniauth.auth").to_s]] }
-    }.to_app
+    end.to_app
   end
 
   def session
@@ -24,7 +24,7 @@ describe "OmniAuth::Strategies::OAuth" do
 
   before do
     stub_request(:post, "https://api.example.org/oauth/request_token").
-       to_return(:body => "oauth_token=yourtoken&oauth_token_secret=yoursecret&oauth_callback_confirmed=true")
+      to_return(:body => "oauth_token=yourtoken&oauth_token_secret=yoursecret&oauth_callback_confirmed=true")
   end
 
   it "should add a camelization for itself" do
@@ -47,25 +47,25 @@ describe "OmniAuth::Strategies::OAuth" do
         expect(last_response).to be_redirect
         expect([
           "https://api.example.org/oauth/authorize?abc=def&oauth_token=yourtoken",
-          "https://api.example.org/oauth/authorize?oauth_token=yourtoken&abc=def"
+          "https://api.example.org/oauth/authorize?oauth_token=yourtoken&abc=def",
         ]).to be_include(last_response.headers["Location"])
       end
 
       it "should set appropriate session variables" do
-        expect(session["oauth"]).to eq({"example.org" => {"callback_confirmed" => true, "request_token" => "yourtoken", "request_secret" => "yoursecret"}})
+        expect(session["oauth"]).to eq("example.org" => {"callback_confirmed" => true, "request_token" => "yourtoken", "request_secret" => "yoursecret"})
       end
 
       it "should pass request_params to get_request_token" do
         get "/auth/example.org_with_request_params"
         expect(WebMock).to have_requested(:post, "https://api.example.org/oauth/request_token").
-           with {|req| req.body == "scope=http%3A%2F%2Ffoobar.example.org" }
+          with { |req| req.body == "scope=http%3A%2F%2Ffoobar.example.org" }
       end
     end
 
     context "unsuccessful" do
       before do
         stub_request(:post, "https://api.example.org/oauth/request_token").
-           to_raise(::Net::HTTPFatalError.new(%Q{502 "Bad Gateway"}, nil))
+          to_raise(::Net::HTTPFatalError.new('502 "Bad Gateway"', nil))
         get "/auth/example.org"
       end
 
@@ -77,7 +77,7 @@ describe "OmniAuth::Strategies::OAuth" do
       context "SSL failure" do
         before do
           stub_request(:post, "https://api.example.org/oauth/request_token").
-             to_raise(::OpenSSL::SSL::SSLError.new("SSL_connect returned=1 errno=0 state=SSLv3 read server certificate B: certificate verify failed"))
+            to_raise(::OpenSSL::SSL::SSLError.new("SSL_connect returned=1 errno=0 state=SSLv3 read server certificate B: certificate verify failed"))
           get "/auth/example.org"
         end
 
@@ -89,11 +89,11 @@ describe "OmniAuth::Strategies::OAuth" do
     end
   end
 
-    describe "/auth/{name}/callback" do
-      before do
-        stub_request(:post, "https://api.example.org/oauth/access_token").
-         to_return(:body => "oauth_token=yourtoken&oauth_token_secret=yoursecret")
-      get "/auth/example.org/callback", {:oauth_verifier => "dudeman"}, {"rack.session" => {"oauth" => {"example.org" => {"callback_confirmed" => true, "request_token" => "yourtoken", "request_secret" => "yoursecret"}}}}
+  describe "/auth/{name}/callback" do
+    before do
+      stub_request(:post, "https://api.example.org/oauth/access_token").
+        to_return(:body => "oauth_token=yourtoken&oauth_token_secret=yoursecret")
+      get "/auth/example.org/callback", {:oauth_verifier => "dudeman"}, "rack.session" => {"oauth" => {"example.org" => {"callback_confirmed" => true, "request_token" => "yourtoken", "request_secret" => "yoursecret"}}}
     end
 
     it "should exchange the request token for an access token" do
@@ -107,9 +107,9 @@ describe "OmniAuth::Strategies::OAuth" do
 
     context "bad gateway (or any 5xx) for access_token" do
       before do
-        stub_request(:post, "https://api.example.org/oauth/access_token").
-           to_raise(::Net::HTTPFatalError.new(%Q{502 "Bad Gateway"}, nil))
-        get "/auth/example.org/callback", {:oauth_verifier => "dudeman"}, {"rack.session" => {"oauth" => {"example.org" => {"callback_confirmed" => true, "request_token" => "yourtoken", "request_secret" => "yoursecret"}}}}
+        stub_request(:post, "https://api.example.org/oauth/access_token")  .
+          to_raise(::Net::HTTPFatalError.new('502 "Bad Gateway"', nil))
+        get "/auth/example.org/callback", {:oauth_verifier => "dudeman"}, "rack.session" => {"oauth" => {"example.org" => {"callback_confirmed" => true, "request_token" => "yourtoken", "request_secret" => "yoursecret"}}}
       end
 
       it "should call fail! with :service_unavailable" do
@@ -120,9 +120,9 @@ describe "OmniAuth::Strategies::OAuth" do
 
     context "SSL failure" do
       before do
-        stub_request(:post, "https://api.example.org/oauth/access_token").
-           to_raise(::OpenSSL::SSL::SSLError.new("SSL_connect returned=1 errno=0 state=SSLv3 read server certificate B: certificate verify failed"))
-        get "/auth/example.org/callback", {:oauth_verifier => "dudeman"}, {"rack.session" => {"oauth" => {"example.org" => {"callback_confirmed" => true, "request_token" => "yourtoken", "request_secret" => "yoursecret"}}}}
+        stub_request(:post, "https://api.example.org/oauth/access_token")  .
+          to_raise(::OpenSSL::SSL::SSLError.new("SSL_connect returned=1 errno=0 state=SSLv3 read server certificate B: certificate verify failed"))
+        get "/auth/example.org/callback", {:oauth_verifier => "dudeman"}, "rack.session" => {"oauth" => {"example.org" => {"callback_confirmed" => true, "request_token" => "yourtoken", "request_secret" => "yoursecret"}}}
       end
 
       it "should call fail! with :service_unavailable" do
@@ -135,8 +135,8 @@ describe "OmniAuth::Strategies::OAuth" do
   describe "/auth/{name}/callback with expired session" do
     before do
       stub_request(:post, "https://api.example.org/oauth/access_token").
-         to_return(:body => "oauth_token=yourtoken&oauth_token_secret=yoursecret")
-      get "/auth/example.org/callback", {:oauth_verifier => "dudeman"}, {"rack.session" => {}}
+        to_return(:body => "oauth_token=yourtoken&oauth_token_secret=yoursecret")
+      get "/auth/example.org/callback", {:oauth_verifier => "dudeman"}, "rack.session" => {}
     end
 
     it "should call fail! with :session_expired" do
