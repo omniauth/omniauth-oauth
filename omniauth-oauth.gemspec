@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-require File.expand_path('../lib/omniauth-oauth/version', __FILE__)
+require File.expand_path("../lib/omniauth-oauth/version", __FILE__)
 
 Gem::Specification.new do |gem|
   gem.authors       = ["Michael Bleigh"]
@@ -9,9 +9,9 @@ Gem::Specification.new do |gem|
   gem.homepage      = "https://github.com/intridea/omniauth-oauth"
   gem.license       = "MIT"
 
-  gem.add_dependency 'omniauth', '~> 1.0'
-  gem.add_dependency 'oauth'
-  gem.add_development_dependency 'bundler', '~> 1.9'
+  gem.add_dependency "omniauth", "~> 1.0"
+  gem.add_dependency "oauth"
+  gem.add_development_dependency "bundler", "~> 1.9"
 
   gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.files         = `git ls-files`.split("\n")
@@ -19,5 +19,5 @@ Gem::Specification.new do |gem|
   gem.name          = "omniauth-oauth"
   gem.require_paths = ["lib"]
   gem.version       = OmniAuth::OAuth::VERSION
-  gem.license       = 'MIT'
+  gem.license       = "MIT"
 end

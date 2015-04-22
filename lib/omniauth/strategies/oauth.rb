@@ -1,5 +1,5 @@
-require 'oauth'
-require 'omniauth'
+require "oauth"
+require "omniauth"
 
 module OmniAuth
   module Strategies
@@ -26,8 +26,8 @@ module OmniAuth
 
       def request_phase
         request_token = consumer.get_request_token({:oauth_callback => callback_url}, options.request_params)
-        session['oauth'] ||= {}
-        session['oauth'][name.to_s] = {'callback_confirmed' => request_token.callback_confirmed?, 'request_token' => request_token.token, 'request_secret' => request_token.secret}
+        session["oauth"] ||= {}
+        session["oauth"][name.to_s] = {"callback_confirmed" => request_token.callback_confirmed?, "request_token" => request_token.token, "request_secret" => request_token.secret}
 
         if request_token.callback_confirmed?
           redirect request_token.authorize_url(options[:authorize_params])
@@ -42,13 +42,13 @@ module OmniAuth
       end
 
       def callback_phase
-        raise OmniAuth::NoSessionError.new("Session Expired") if session['oauth'].nil?
+        raise OmniAuth::NoSessionError.new("Session Expired") if session["oauth"].nil?
 
-        request_token = ::OAuth::RequestToken.new(consumer, session['oauth'][name.to_s].delete('request_token'), session['oauth'][name.to_s].delete('request_secret'))
+        request_token = ::OAuth::RequestToken.new(consumer, session["oauth"][name.to_s].delete("request_token"), session["oauth"][name.to_s].delete("request_secret"))
 
         opts = {}
-        if session['oauth'][name.to_s]['callback_confirmed']
-          opts[:oauth_verifier] = request['oauth_verifier']
+        if session["oauth"][name.to_s]["callback_confirmed"]
+          opts[:oauth_verifier] = request["oauth_verifier"]
         else
           opts[:oauth_callback] = callback_url
         end
@@ -66,14 +66,14 @@ module OmniAuth
       end
 
       credentials do
-        {'token' => access_token.token, 'secret' => access_token.secret}
+        {"token" => access_token.token, "secret" => access_token.secret}
       end
 
       extra do
-        {'access_token' => access_token}
+        {"access_token" => access_token}
       end
     end
   end
 end
 
-OmniAuth.config.add_camelization 'oauth', 'OAuth'
+OmniAuth.config.add_camelization "oauth", "OAuth"

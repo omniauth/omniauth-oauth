@@ -1,3 +1,3 @@
 require "omniauth-oauth/version"
-require 'omniauth/strategies/oauth'
+require "omniauth/strategies/oauth"
 
