@@ -18,4 +18,5 @@ Gem::Specification.new do |gem|
   gem.name          = "omniauth-oauth"
   gem.require_paths = ["lib"]
   gem.version       = OmniAuth::OAuth::VERSION
+  gem.license       = 'MIT'
 end
