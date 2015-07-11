@@ -86,6 +86,20 @@ describe "OmniAuth::Strategies::OAuth" do
           last_request.env["omniauth.error.type"] = :service_unavailable
         end
       end
+
+      context "invalid consumer credentials" do
+        before do
+          dummy_response_object = Struct.new(:code, :message).new(401, "Unauthorized")
+          stub_request(:post, "https://api.example.org/oauth/request_token").
+            to_raise(::OAuth::Unauthorized.new(dummy_response_object))
+          get "/auth/example.org"
+        end
+
+        it "should call fail! with :invalid_credentials" do
+          expect(last_request.env["omniauth.error"]).to be_kind_of(::OAuth::Unauthorized)
+          last_request.env["omniauth.error.type"] = :invalid_credentials
+        end
+      end
     end
   end
 

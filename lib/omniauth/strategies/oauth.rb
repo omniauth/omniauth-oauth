@@ -39,6 +39,8 @@ module OmniAuth
         fail!(:timeout, e)
       rescue ::Net::HTTPFatalError, ::OpenSSL::SSL::SSLError => e
         fail!(:service_unavailable, e)
+      rescue ::OAuth::Unauthorized => e
+        fail!(:invalid_credentials, e)
       end
 
       def callback_phase # rubocop:disable MethodLength
