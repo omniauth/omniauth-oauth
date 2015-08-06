@@ -144,4 +144,17 @@ describe "OmniAuth::Strategies::OAuth" do
       last_request.env["omniauth.error.type"] = :session_expired
     end
   end
+
+  describe "/auth/{name}/callback with wrong session" do
+    before do
+      stub_request(:post, "https://api.example.org/oauth/access_token").
+        to_return(:body => "oauth_token=yourtoken&oauth_token_secret=yoursecret")
+      get "/auth/example.org/callback", {:oauth_verifier => "dudeman"}, "rack.session" => {"oauth" => {"different-example.org" => {"callback_confirmed" => true}}}
+    end
+
+    it "should call fail! with :session_expired" do
+      expect(last_request.env["omniauth.error"]).to be_kind_of(::OmniAuth::NoSessionError)
+      last_request.env["omniauth.error.type"] = :session_expired
+    end
+  end
 end
