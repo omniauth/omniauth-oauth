@@ -53,7 +53,8 @@ module OmniAuth
           opts[:oauth_callback] = callback_url
         end
 
-        @access_token = request_token.get_access_token(opts)
+        callback_params = {}
+        @access_token = request_token.get_access_token(opts, callback_params)
         super
       rescue ::Timeout::Error => e
         fail!(:timeout, e)
