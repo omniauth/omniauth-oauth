@@ -2,7 +2,7 @@ $LOAD_PATH.unshift File.expand_path("..", __FILE__)
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 require "simplecov"
 SimpleCov.start do
-  minimum_coverage(89.8)
+  minimum_coverage(89.79)
 end
 require "rspec"
 require "rack/test"
