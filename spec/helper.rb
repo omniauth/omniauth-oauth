@@ -10,6 +10,8 @@ require "webmock/rspec"
 require "omniauth"
 require "omniauth-oauth"
 
+OmniAuth.config.request_validation_phase = nil
+
 RSpec.configure do |config|
   config.include WebMock::API
   config.include Rack::Test::Methods
