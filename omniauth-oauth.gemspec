@@ -8,9 +8,8 @@ Gem::Specification.new do |gem|
   gem.homepage      = "https://github.com/intridea/omniauth-oauth"
   gem.license       = "MIT"
 
-  gem.add_dependency "omniauth", "~> 1.0"
+  gem.add_dependency "omniauth", ">= 1.0", "< 3"
   gem.add_dependency "oauth"
-  gem.add_development_dependency "bundler", "~> 1.9"
 
   gem.executables   = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
   gem.files         = `git ls-files`.split("\n")
