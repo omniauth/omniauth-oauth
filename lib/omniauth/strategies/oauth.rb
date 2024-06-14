@@ -48,7 +48,7 @@ module OmniAuth
 
         opts = {}
         if session["oauth"][name.to_s]["callback_confirmed"]
-          opts[:oauth_verifier] = request["oauth_verifier"]
+          opts[:oauth_verifier] = request.params["oauth_verifier"]
         else
           opts[:oauth_callback] = callback_url
         end
