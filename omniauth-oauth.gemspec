@@ -5,7 +5,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["michael@intridea.com", "sferik@gmail.com"]
   gem.description   = "A generic OAuth (1.0/1.0a) strategy for OmniAuth."
   gem.summary       = gem.description
-  gem.homepage      = "https://github.com/intridea/omniauth-oauth"
+  gem.homepage      = "https://github.com/omniauth/omniauth-oauth"
   gem.license       = "MIT"
 
   gem.add_dependency "omniauth", ">= 1.0", "< 3"
