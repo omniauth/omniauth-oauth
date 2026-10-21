@@ -19,8 +19,10 @@ module OmniAuth
 
       def consumer
         consumer = ::OAuth::Consumer.new(options.consumer_key, options.consumer_secret, options.client_options)
-        consumer.http.open_timeout = options.open_timeout if options.open_timeout
-        consumer.http.read_timeout = options.read_timeout if options.read_timeout
+        open_timeout = options.open_timeout
+        read_timeout = options.read_timeout
+        consumer.http.open_timeout = open_timeout if open_timeout
+        consumer.http.read_timeout = read_timeout if read_timeout
         consumer
       end
 
@@ -30,9 +32,9 @@ module OmniAuth
         session["oauth"][name.to_s] = {"callback_confirmed" => request_token.callback_confirmed?, "request_token" => request_token.token, "request_secret" => request_token.secret}
 
         if request_token.callback_confirmed?
-          redirect request_token.authorize_url(options[:authorize_params])
+          redirect request_token.authorize_url(options.authorize_params)
         else
-          redirect request_token.authorize_url(options[:authorize_params].merge(:oauth_callback => callback_url))
+          redirect request_token.authorize_url(options.authorize_params.merge(:oauth_callback => callback_url))
         end
 
       rescue ::Timeout::Error => e
@@ -46,7 +48,7 @@ module OmniAuth
 
         request_token = ::OAuth::RequestToken.new(consumer, session["oauth"][name.to_s].delete("request_token"), session["oauth"][name.to_s].delete("request_secret"))
 
-        opts = {}
+        opts = {} #: Hash[Symbol, untyped]
         if session["oauth"][name.to_s]["callback_confirmed"]
           opts[:oauth_verifier] = request.params["oauth_verifier"]
         else

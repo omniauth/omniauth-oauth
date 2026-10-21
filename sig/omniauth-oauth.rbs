@@ -1,0 +1,54 @@
+module OmniAuth
+  module OAuth
+    VERSION: String
+  end
+
+  module Strategies
+    # A generic OAuth 1.0a strategy. Provider strategies subclass it and set
+    # client_options (site, request_token_path, authorize_path, and
+    # access_token_path) for their provider.
+    class OAuth
+      include Strategy
+      extend Strategy::ClassMethods
+
+      # The options this strategy adds to OmniAuth's. Strategy::Options
+      # answers them through Hashie::Mash's method_missing.
+      interface _Options
+        def consumer_key: () -> String?
+        def consumer_secret: () -> String?
+        def client_options: () -> Strategy::Options
+        def open_timeout: () -> (Integer | Float | nil)
+        def read_timeout: () -> (Integer | Float | nil)
+        def authorize_params: () -> Strategy::Options
+        def request_params: () -> Strategy::Options
+      end
+
+      # The fetcher blocks run with the strategy instance as self.
+      def self.uid: () { () [self: instance] -> untyped } -> Proc
+                  | () -> Proc?
+
+      def self.info: () { () [self: instance] -> Hash[untyped, untyped]? } -> Proc
+                   | () -> Proc?
+
+      def self.extra: () { () [self: instance] -> Hash[untyped, untyped]? } -> Proc
+                    | () -> Proc?
+
+      def self.credentials: () { () [self: instance] -> Hash[untyped, untyped]? } -> Proc
+                          | () -> Proc?
+
+      def options: () -> (Strategy::Options & _Options)
+
+      # Set by the callback phase, which runs before the fetcher blocks that
+      # read it.
+      attr_reader access_token: ::OAuth::AccessToken
+
+      @access_token: ::OAuth::AccessToken
+
+      def consumer: () -> ::OAuth::Consumer
+
+      def request_phase: () -> rack_response
+
+      def callback_phase: () -> rack_response
+    end
+  end
+end

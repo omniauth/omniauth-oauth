@@ -1,0 +1,40 @@
+# The parts of the oauth gem the strategy uses. oauth ships signatures, but
+# they don't load (see rbs_collection.yaml). These are for Steep only and
+# aren't shipped with the gem.
+module OAuth
+  class Error < StandardError
+  end
+
+  class Unauthorized < Error
+  end
+
+  class Consumer
+    def initialize: (String? consumer_key, String? consumer_secret, ?Hash[untyped, untyped] options) -> void
+
+    def http: () -> Net::HTTP
+
+    def get_request_token: (?Hash[Symbol, untyped] request_options, *untyped arguments) ?{ (String) -> untyped } -> RequestToken
+  end
+
+  class Token
+    attr_accessor token: String
+    attr_accessor secret: String
+  end
+
+  class ConsumerToken < Token
+    attr_accessor consumer: Consumer
+
+    def initialize: (Consumer consumer, ?String? token, ?String? secret) -> void
+  end
+
+  class RequestToken < ConsumerToken
+    def authorize_url: (?Hash[untyped, untyped]? params) -> String
+
+    def callback_confirmed?: () -> bool
+
+    def get_access_token: (?Hash[Symbol, untyped] options, *untyped arguments) -> AccessToken
+  end
+
+  class AccessToken < ConsumerToken
+  end
+end

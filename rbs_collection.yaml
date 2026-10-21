@@ -1,0 +1,21 @@
+# Download RBS for dependencies with `bundle exec rbs collection install`.
+sources:
+  - type: git
+    name: ruby/gem_rbs_collection
+    remote: https://github.com/ruby/gem_rbs_collection.git
+    revision: main
+    repo_dir: gems
+
+path: .gem_rbs_collection
+
+gems:
+  # Development-only gems that Steep doesn't need types for.
+  - name: steep
+    ignore: true
+  # oauth's signatures refer to OAuth::AUTH_SANITIZER::FilteredAttributes,
+  # which they don't declare, so they don't load. steep/shims/oauth.rbs
+  # declares the parts the strategy uses instead.
+  - name: oauth
+    ignore: true
+  - name: oauth-tty
+    ignore: true

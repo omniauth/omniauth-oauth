@@ -4,6 +4,14 @@ gemspec
 
 gem "rake"
 
+# Steep 2.1 needs Ruby 3.3+, so older Rubies skip the steep task. It checks
+# against the types omniauth ships from 2.2.0 on, so use omniauth's master
+# branch until 2.2.0 is released.
+if RUBY_VERSION >= "3.3"
+  gem "omniauth", :git => "https://github.com/omniauth/omniauth.git"
+  gem "steep", "~> 2.1", :require => false, :platforms => :mri
+end
+
 group :test do
   gem "rack-test"
   gem "rspec", "~> 3.2"
