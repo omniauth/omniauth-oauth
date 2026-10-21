@@ -9,7 +9,7 @@ begin
   RuboCop::RakeTask.new
 rescue LoadError
   task :rubocop do
-    $stderr.puts "Rubocop is disabled"
+    warn "Skipping RuboCop: it is not installed. It needs Ruby 2.7 or later; run `bundle install` there."
   end
 end
 
@@ -40,4 +40,4 @@ rescue LoadError
   end
 end
 
-task :default => [:spec, :rubocop, :steep, :mutant]
+task :default => %i[spec rubocop steep mutant]

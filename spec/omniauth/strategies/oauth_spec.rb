@@ -1,11 +1,11 @@
 require "helper"
 
-describe "OmniAuth::Strategies::OAuth" do
-  class MyOAuthProvider < OmniAuth::Strategies::OAuth
-    uid { access_token.token }
-    info { {"name" => access_token.token} }
-  end
+class MyOAuthProvider < OmniAuth::Strategies::OAuth
+  uid { access_token.token }
+  info { {"name" => access_token.token} }
+end
 
+describe "OmniAuth::Strategies::OAuth" do
   def app
     Rack::Builder.new do
       use OmniAuth::Test::PhonySession
@@ -47,9 +47,9 @@ describe "OmniAuth::Strategies::OAuth" do
         post "/auth/example.org_with_authorize_params"
         expect(last_response).to be_redirect
         expect([
-          "https://api.example.org/oauth/authorize?abc=def&oauth_token=yourtoken",
-          "https://api.example.org/oauth/authorize?oauth_token=yourtoken&abc=def",
-        ]).to be_include(last_response.headers["Location"])
+                 "https://api.example.org/oauth/authorize?abc=def&oauth_token=yourtoken",
+                 "https://api.example.org/oauth/authorize?oauth_token=yourtoken&abc=def",
+               ]).to be_include(last_response.headers["Location"])
       end
 
       it "should set appropriate session variables" do
@@ -58,32 +58,32 @@ describe "OmniAuth::Strategies::OAuth" do
 
       it "should pass request_params to get_request_token" do
         post "/auth/example.org_with_request_params"
-        expect(WebMock).to have_requested(:post, "https://api.example.org/oauth/request_token").
-          with { |req| req.body == "scope=http%3A%2F%2Ffoobar.example.org" }
+        expect(WebMock).to(have_requested(:post, "https://api.example.org/oauth/request_token").
+          with { |req| req.body == "scope=http%3A%2F%2Ffoobar.example.org" })
       end
     end
 
     context "unsuccessful" do
       before do
         stub_request(:post, "https://api.example.org/oauth/request_token").
-          to_raise(::Net::HTTPFatalError.new('502 "Bad Gateway"', nil))
+          to_raise(Net::HTTPFatalError.new('502 "Bad Gateway"', nil))
         post "/auth/example.org"
       end
 
       it "should call fail! with :service_unavailable" do
-        expect(last_request.env["omniauth.error"]).to be_kind_of(::Net::HTTPFatalError)
+        expect(last_request.env["omniauth.error"]).to be_kind_of(Net::HTTPFatalError)
         expect(last_request.env["omniauth.error.type"]).to eq(:service_unavailable)
       end
 
       context "SSL failure" do
         before do
           stub_request(:post, "https://api.example.org/oauth/request_token").
-            to_raise(::OpenSSL::SSL::SSLError.new("SSL_connect returned=1 errno=0 state=SSLv3 read server certificate B: certificate verify failed"))
+            to_raise(OpenSSL::SSL::SSLError.new("SSL_connect returned=1 errno=0 state=SSLv3 read server certificate B: certificate verify failed"))
           post "/auth/example.org"
         end
 
         it "should call fail! with :service_unavailable" do
-          expect(last_request.env["omniauth.error"]).to be_kind_of(::OpenSSL::SSL::SSLError)
+          expect(last_request.env["omniauth.error"]).to be_kind_of(OpenSSL::SSL::SSLError)
           expect(last_request.env["omniauth.error.type"]).to eq(:service_unavailable)
         end
       end
@@ -108,26 +108,26 @@ describe "OmniAuth::Strategies::OAuth" do
 
     context "bad gateway (or any 5xx) for access_token" do
       before do
-        stub_request(:post, "https://api.example.org/oauth/access_token")  .
-          to_raise(::Net::HTTPFatalError.new('502 "Bad Gateway"', nil))
+        stub_request(:post, "https://api.example.org/oauth/access_token").
+          to_raise(Net::HTTPFatalError.new('502 "Bad Gateway"', nil))
         get "/auth/example.org/callback", {:oauth_verifier => "dudeman"}, "rack.session" => {"oauth" => {"example.org" => {"callback_confirmed" => true, "request_token" => "yourtoken", "request_secret" => "yoursecret"}}}
       end
 
       it "should call fail! with :service_unavailable" do
-        expect(last_request.env["omniauth.error"]).to be_kind_of(::Net::HTTPFatalError)
+        expect(last_request.env["omniauth.error"]).to be_kind_of(Net::HTTPFatalError)
         expect(last_request.env["omniauth.error.type"]).to eq(:service_unavailable)
       end
     end
 
     context "SSL failure" do
       before do
-        stub_request(:post, "https://api.example.org/oauth/access_token")  .
-          to_raise(::OpenSSL::SSL::SSLError.new("SSL_connect returned=1 errno=0 state=SSLv3 read server certificate B: certificate verify failed"))
+        stub_request(:post, "https://api.example.org/oauth/access_token").
+          to_raise(OpenSSL::SSL::SSLError.new("SSL_connect returned=1 errno=0 state=SSLv3 read server certificate B: certificate verify failed"))
         get "/auth/example.org/callback", {:oauth_verifier => "dudeman"}, "rack.session" => {"oauth" => {"example.org" => {"callback_confirmed" => true, "request_token" => "yourtoken", "request_secret" => "yoursecret"}}}
       end
 
       it "should call fail! with :service_unavailable" do
-        expect(last_request.env["omniauth.error"]).to be_kind_of(::OpenSSL::SSL::SSLError)
+        expect(last_request.env["omniauth.error"]).to be_kind_of(OpenSSL::SSL::SSLError)
         expect(last_request.env["omniauth.error.type"]).to eq(:service_unavailable)
       end
     end
@@ -180,7 +180,7 @@ describe "OmniAuth::Strategies::OAuth" do
     end
 
     it "should call fail! with :session_expired" do
-      expect(last_request.env["omniauth.error"]).to be_kind_of(::OmniAuth::NoSessionError)
+      expect(last_request.env["omniauth.error"]).to be_kind_of(OmniAuth::NoSessionError)
       expect(last_request.env["omniauth.error.type"]).to eq(:session_expired)
     end
   end
@@ -221,7 +221,7 @@ describe "OmniAuth::Strategies::OAuth" do
     end
 
     it "should call fail! with :timeout" do
-      expect(last_request.env["omniauth.error"]).to be_kind_of(::Timeout::Error)
+      expect(last_request.env["omniauth.error"]).to be_kind_of(Timeout::Error)
       expect(last_request.env["omniauth.error.type"]).to eq(:timeout)
     end
   end
@@ -247,14 +247,14 @@ describe "OmniAuth::Strategies::OAuth" do
     it "calls fail! with :timeout when the access token request times out" do
       stub_request(:post, "https://api.example.org/oauth/access_token").to_timeout
       callback
-      expect(last_request.env["omniauth.error"]).to be_kind_of(::Timeout::Error)
+      expect(last_request.env["omniauth.error"]).to be_kind_of(Timeout::Error)
       expect(last_request.env["omniauth.error.type"]).to eq(:timeout)
     end
 
     it "calls fail! with :invalid_credentials when the provider rejects the request token" do
       stub_request(:post, "https://api.example.org/oauth/access_token").to_return(:status => 401, :body => "invalid token")
       callback
-      expect(last_request.env["omniauth.error"]).to be_kind_of(::OAuth::Unauthorized)
+      expect(last_request.env["omniauth.error"]).to be_kind_of(OAuth::Unauthorized)
       expect(last_request.env["omniauth.error.type"]).to eq(:invalid_credentials)
     end
   end

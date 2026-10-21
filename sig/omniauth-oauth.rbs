@@ -49,6 +49,10 @@ module OmniAuth
       def request_phase: () -> rack_response
 
       def callback_phase: () -> rack_response
+
+      # The verifier when the provider confirmed the callback URL (OAuth
+      # 1.0a), or the callback URL when it didn't (OAuth 1.0).
+      def access_token_options: (Hash[String, untyped] provider_session) -> ({ oauth_verifier: String? } | { oauth_callback: String })
     end
   end
 end

@@ -6,7 +6,7 @@ module OmniAuth
     class OAuth
       include OmniAuth::Strategy
 
-      args [:consumer_key, :consumer_secret]
+      args %i[consumer_key consumer_secret]
       option :consumer_key, nil
       option :consumer_secret, nil
       option :client_options, {}
@@ -26,7 +26,7 @@ module OmniAuth
         consumer
       end
 
-      def request_phase # rubocop:disable MethodLength
+      def request_phase
         request_token = consumer.get_request_token({:oauth_callback => callback_url}, options.request_params)
         session["oauth"] ||= {}
         session.fetch("oauth")[name.to_s] = {"callback_confirmed" => request_token.callback_confirmed?, "request_token" => request_token.token, "request_secret" => request_token.secret}
@@ -36,27 +36,18 @@ module OmniAuth
         else
           redirect request_token.authorize_url(options.authorize_params.merge(:oauth_callback => callback_url))
         end
-
       rescue ::Timeout::Error => e
         fail!(:timeout, e)
       rescue ::Net::HTTPFatalError, ::OpenSSL::SSL::SSLError => e
         fail!(:service_unavailable, e)
       end
 
-      def callback_phase # rubocop:disable MethodLength
+      def callback_phase
         provider_session = (session["oauth"] || {})[name.to_s]
-        fail(NoSessionError, "Session Expired") unless provider_session
+        raise(NoSessionError, "Session Expired") unless provider_session
 
         request_token = ::OAuth::RequestToken.new(consumer, provider_session.delete("request_token"), provider_session.delete("request_secret"))
-
-        opts = {} #: Hash[Symbol, untyped]
-        if provider_session["callback_confirmed"]
-          opts[:oauth_verifier] = request.params["oauth_verifier"]
-        else
-          opts[:oauth_callback] = callback_url
-        end
-
-        @access_token = request_token.get_access_token(opts)
+        @access_token = request_token.get_access_token(access_token_options(provider_session))
         super
       rescue ::Timeout::Error => e
         fail!(:timeout, e)
@@ -66,6 +57,16 @@ module OmniAuth
         fail!(:invalid_credentials, e)
       rescue ::OmniAuth::NoSessionError => e
         fail!(:session_expired, e)
+      end
+
+      # The verifier when the provider confirmed the callback URL (OAuth
+      # 1.0a), or the callback URL when it didn't (OAuth 1.0).
+      def access_token_options(provider_session)
+        if provider_session["callback_confirmed"]
+          {:oauth_verifier => request.params["oauth_verifier"]}
+        else
+          {:oauth_callback => callback_url}
+        end
       end
 
       credentials do

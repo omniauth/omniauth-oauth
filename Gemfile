@@ -4,6 +4,9 @@ gemspec
 
 gem "rake"
 
+# RuboCop 1.92 needs Ruby 2.7+, so older Rubies skip the rubocop task.
+gem "rubocop", "~> 1.92.0", :require => false if RUBY_VERSION >= "2.7"
+
 # Steep 2.1 needs Ruby 3.3+, so older Rubies skip the steep task. It checks
 # against the types omniauth ships from 2.2.0 on, so use omniauth's master
 # branch until 2.2.0 is released.
@@ -21,7 +24,6 @@ end
 group :test do
   gem "rack-test"
   gem "rspec", "~> 3.2"
-  gem "rubocop", ">= 0.30", :platforms => [:ruby_19, :ruby_20, :ruby_21, :ruby_22]
   # SimpleCov 1.3 needs Ruby 3.3+, so older Rubies skip coverage.
   gem "simplecov", "~> 1.3", :require => false if RUBY_VERSION >= "3.3"
   gem "webmock"
