@@ -8,6 +8,7 @@ group :test do
   gem "rack-test"
   gem "rspec", "~> 3.2"
   gem "rubocop", ">= 0.30", :platforms => [:ruby_19, :ruby_20, :ruby_21, :ruby_22]
-  gem "simplecov"
+  # SimpleCov 1.3 needs Ruby 3.3+, so older Rubies skip coverage.
+  gem "simplecov", "~> 1.3", :require => false if RUBY_VERSION >= "3.3"
   gem "webmock"
 end

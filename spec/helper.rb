@@ -1,8 +1,10 @@
 $LOAD_PATH.unshift File.expand_path("..", __FILE__)
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
-require "simplecov"
-SimpleCov.start do
-  minimum_coverage(89.79)
+# Coverage is measured on CRuby 3.3+ only. SimpleCov 1.3 needs Ruby 3.3,
+# and JRuby and TruffleRuby count lines differently.
+if RUBY_ENGINE == "ruby" && Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.3")
+  require "simplecov"
+  SimpleCov.start "strict"
 end
 require "rspec"
 require "rack/test"

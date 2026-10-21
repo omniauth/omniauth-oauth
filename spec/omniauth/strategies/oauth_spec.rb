@@ -71,7 +71,7 @@ describe "OmniAuth::Strategies::OAuth" do
 
       it "should call fail! with :service_unavailable" do
         expect(last_request.env["omniauth.error"]).to be_kind_of(::Net::HTTPFatalError)
-        last_request.env["omniauth.error.type"] = :service_unavailable
+        expect(last_request.env["omniauth.error.type"]).to eq(:service_unavailable)
       end
 
       context "SSL failure" do
@@ -83,7 +83,7 @@ describe "OmniAuth::Strategies::OAuth" do
 
         it "should call fail! with :service_unavailable" do
           expect(last_request.env["omniauth.error"]).to be_kind_of(::OpenSSL::SSL::SSLError)
-          last_request.env["omniauth.error.type"] = :service_unavailable
+          expect(last_request.env["omniauth.error.type"]).to eq(:service_unavailable)
         end
       end
     end
@@ -114,7 +114,7 @@ describe "OmniAuth::Strategies::OAuth" do
 
       it "should call fail! with :service_unavailable" do
         expect(last_request.env["omniauth.error"]).to be_kind_of(::Net::HTTPFatalError)
-        last_request.env["omniauth.error.type"] = :service_unavailable
+        expect(last_request.env["omniauth.error.type"]).to eq(:service_unavailable)
       end
     end
 
@@ -127,7 +127,7 @@ describe "OmniAuth::Strategies::OAuth" do
 
       it "should call fail! with :service_unavailable" do
         expect(last_request.env["omniauth.error"]).to be_kind_of(::OpenSSL::SSL::SSLError)
-        last_request.env["omniauth.error.type"] = :service_unavailable
+        expect(last_request.env["omniauth.error.type"]).to eq(:service_unavailable)
       end
     end
   end
@@ -180,7 +180,81 @@ describe "OmniAuth::Strategies::OAuth" do
 
     it "should call fail! with :session_expired" do
       expect(last_request.env["omniauth.error"]).to be_kind_of(::OmniAuth::NoSessionError)
-      last_request.env["omniauth.error.type"] = :session_expired
+      expect(last_request.env["omniauth.error.type"]).to eq(:session_expired)
+    end
+  end
+
+  describe "#consumer" do
+    it "sets the HTTP timeouts from the options" do
+      http = MyOAuthProvider.new(nil, "abc", "def", :open_timeout => 5, :read_timeout => 10).consumer.http
+      expect([http.open_timeout, http.read_timeout]).to eq([5, 10])
+    end
+
+    it "keeps Net::HTTP's default timeouts when the options are nil" do
+      http = MyOAuthProvider.new(nil, "abc", "def", :open_timeout => nil, :read_timeout => nil).consumer.http
+      expect([http.open_timeout, http.read_timeout]).to eq([Net::HTTP.new("example.org").open_timeout, Net::HTTP.new("example.org").read_timeout])
+    end
+  end
+
+  describe "/auth/{name} when the provider doesn't confirm the callback" do
+    before do
+      stub_request(:post, "https://api.example.org/oauth/request_token").
+        to_return(:body => "oauth_token=yourtoken&oauth_token_secret=yoursecret")
+      post "/auth/example.org"
+    end
+
+    it "sends the callback URL in the authorize URL" do
+      location = URI.parse(last_response.headers["Location"])
+      expect(Rack::Utils.parse_query(location.query)).to eq("oauth_token" => "yourtoken", "oauth_callback" => "http://example.org/auth/example.org/callback")
+    end
+
+    it "remembers that the callback wasn't confirmed" do
+      expect(session["oauth"]["example.org"]["callback_confirmed"]).to be(false)
+    end
+  end
+
+  describe "/auth/{name} timeout" do
+    before do
+      stub_request(:post, "https://api.example.org/oauth/request_token").to_timeout
+      post "/auth/example.org"
+    end
+
+    it "should call fail! with :timeout" do
+      expect(last_request.env["omniauth.error"]).to be_kind_of(::Timeout::Error)
+      expect(last_request.env["omniauth.error.type"]).to eq(:timeout)
+    end
+  end
+
+  describe "/auth/{name}/callback when the provider didn't confirm the callback" do
+    before do
+      stub_request(:post, "https://api.example.org/oauth/access_token").
+        to_return(:body => "oauth_token=yourtoken&oauth_token_secret=yoursecret")
+      get "/auth/example.org/callback", {:oauth_verifier => "dudeman"}, "rack.session" => {"oauth" => {"example.org" => {"callback_confirmed" => false, "request_token" => "yourtoken", "request_secret" => "yoursecret"}}}
+    end
+
+    it "sends the callback URL instead of the verifier" do
+      expect(WebMock).to(have_requested(:post, "https://api.example.org/oauth/access_token").with { |req| req.headers["Authorization"].include?("oauth_callback=") && !req.headers["Authorization"].include?("oauth_verifier=") })
+      expect(last_request.env["omniauth.auth"]["provider"]).to eq("example.org")
+    end
+  end
+
+  describe "/auth/{name}/callback errors" do
+    def callback
+      get "/auth/example.org/callback", {:oauth_verifier => "dudeman"}, "rack.session" => {"oauth" => {"example.org" => {"callback_confirmed" => true, "request_token" => "yourtoken", "request_secret" => "yoursecret"}}}
+    end
+
+    it "calls fail! with :timeout when the access token request times out" do
+      stub_request(:post, "https://api.example.org/oauth/access_token").to_timeout
+      callback
+      expect(last_request.env["omniauth.error"]).to be_kind_of(::Timeout::Error)
+      expect(last_request.env["omniauth.error.type"]).to eq(:timeout)
+    end
+
+    it "calls fail! with :invalid_credentials when the provider rejects the request token" do
+      stub_request(:post, "https://api.example.org/oauth/access_token").to_return(:status => 401, :body => "invalid token")
+      callback
+      expect(last_request.env["omniauth.error"]).to be_kind_of(::OAuth::Unauthorized)
+      expect(last_request.env["omniauth.error.type"]).to eq(:invalid_credentials)
     end
   end
 end
