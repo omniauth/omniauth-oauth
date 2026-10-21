@@ -1,8 +1,8 @@
 require File.expand_path("../lib/omniauth-oauth/version", __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.authors       = ["Michael Bleigh", "Erik Michaels-Ober"]
-  gem.email         = ["michael@intridea.com", "sferik@gmail.com"]
+  gem.authors       = ["Erik Berlin", "Michael Bleigh"]
+  gem.email         = ["sferik@gmail.com", "michael@intridea.com"]
   gem.description   = "A generic OAuth (1.0/1.0a) strategy for OmniAuth."
   gem.summary       = gem.description
   gem.homepage      = "https://github.com/omniauth/omniauth-oauth"
