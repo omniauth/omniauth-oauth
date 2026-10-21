@@ -1,8 +1,9 @@
 $LOAD_PATH.unshift File.expand_path("..", __FILE__)
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 # Coverage is measured on CRuby 3.3+ only. SimpleCov 1.3 needs Ruby 3.3,
-# and JRuby and TruffleRuby count lines differently.
-if RUBY_ENGINE == "ruby" && Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.3")
+# and JRuby and TruffleRuby count lines differently. Mutant runs the specs
+# against mutated code, so coverage is skipped there too.
+if RUBY_ENGINE == "ruby" && Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.3") && !defined?(Mutant)
   require "simplecov"
   SimpleCov.start "strict"
 end

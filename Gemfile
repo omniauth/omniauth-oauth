@@ -12,6 +12,12 @@ if RUBY_VERSION >= "3.3"
   gem "steep", "~> 2.1", :require => false, :platforms => :mri
 end
 
+# Mutant needs Ruby 3.3+, so older Rubies skip the mutant task.
+if RUBY_VERSION >= "3.3"
+  gem "mutant", "~> 0.17.1", :platforms => :mri
+  gem "mutant-rspec", "~> 0.17.1", :require => false, :platforms => :mri
+end
+
 group :test do
   gem "rack-test"
   gem "rspec", "~> 3.2"

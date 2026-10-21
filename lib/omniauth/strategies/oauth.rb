@@ -29,7 +29,7 @@ module OmniAuth
       def request_phase # rubocop:disable MethodLength
         request_token = consumer.get_request_token({:oauth_callback => callback_url}, options.request_params)
         session["oauth"] ||= {}
-        session["oauth"][name.to_s] = {"callback_confirmed" => request_token.callback_confirmed?, "request_token" => request_token.token, "request_secret" => request_token.secret}
+        session.fetch("oauth")[name.to_s] = {"callback_confirmed" => request_token.callback_confirmed?, "request_token" => request_token.token, "request_secret" => request_token.secret}
 
         if request_token.callback_confirmed?
           redirect request_token.authorize_url(options.authorize_params)
@@ -44,12 +44,13 @@ module OmniAuth
       end
 
       def callback_phase # rubocop:disable MethodLength
-        fail(OmniAuth::NoSessionError, "Session Expired") if session["oauth"].nil?
+        provider_session = (session["oauth"] || {})[name.to_s]
+        fail(NoSessionError, "Session Expired") unless provider_session
 
-        request_token = ::OAuth::RequestToken.new(consumer, session["oauth"][name.to_s].delete("request_token"), session["oauth"][name.to_s].delete("request_secret"))
+        request_token = ::OAuth::RequestToken.new(consumer, provider_session.delete("request_token"), provider_session.delete("request_secret"))
 
         opts = {} #: Hash[Symbol, untyped]
-        if session["oauth"][name.to_s]["callback_confirmed"]
+        if provider_session["callback_confirmed"]
           opts[:oauth_verifier] = request.params["oauth_verifier"]
         else
           opts[:oauth_callback] = callback_url
