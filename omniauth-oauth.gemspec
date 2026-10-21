@@ -9,6 +9,8 @@ Gem::Specification.new do |gem|
   gem.license       = "MIT"
 
   gem.add_dependency "omniauth", ">= 1.0", "< 3"
+  # oauth calls CGI.parse, which Ruby 4.0 moved out of the standard library.
+  gem.add_dependency "cgi"
   gem.add_dependency "oauth"
   gem.add_dependency "rack", ">= 1.6.2", "< 4"
 
