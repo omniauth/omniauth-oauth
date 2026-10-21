@@ -1,5 +1,13 @@
 # OmniAuth OAuth
 
+[![Gem Version](http://img.shields.io/gem/v/omniauth-oauth.svg)][gem]
+[![Ruby](https://github.com/omniauth/omniauth-oauth/actions/workflows/ci.yml/badge.svg)][githubactions]
+[![Maintainability](https://qlty.sh/gh/omniauth/projects/omniauth-oauth/maintainability.svg)][qlty]
+
+[gem]: https://rubygems.org/gems/omniauth-oauth
+[githubactions]: https://github.com/omniauth/omniauth-oauth/actions/workflows/ci.yml
+[qlty]: https://qlty.sh/gh/omniauth/projects/omniauth-oauth
+
 This gem contains a generic OAuth strategy for OmniAuth. It is meant to
 serve as a building block strategy for other strategies and not to be
 used independently (since it has no inherent way to gather uid and user
