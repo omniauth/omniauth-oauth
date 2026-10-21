@@ -18,6 +18,7 @@ Gem::Specification.new do |gem|
   gem.files         = `git ls-files`.split("\n")
   gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   gem.name          = "omniauth-oauth"
+  gem.required_ruby_version = ">= 2.5"
   gem.require_paths = ["lib"]
   gem.version       = OmniAuth::OAuth::VERSION
 end
