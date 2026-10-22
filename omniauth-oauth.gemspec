@@ -19,5 +19,6 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = ">= 2.5"
   gem.require_paths = ["lib"]
   gem.version       = OmniAuth::OAuth::VERSION
+  gem.metadata["changelog_uri"] = "#{gem.homepage}/blob/master/CHANGELOG.md"
   gem.metadata["rubygems_mfa_required"] = "true"
 end
