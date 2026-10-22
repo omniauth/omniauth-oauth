@@ -8,7 +8,7 @@ Gem::Specification.new do |gem|
   gem.homepage      = "https://github.com/omniauth/omniauth-oauth"
   gem.license       = "MIT"
 
-  gem.add_dependency "omniauth", ">= 1.0", "< 3"
+  gem.add_dependency "omniauth", "~> 2.3", ">= 2.3.1"
   # oauth calls CGI.parse, which Ruby 4.0 moved out of the standard library.
   gem.add_dependency "cgi"
   gem.add_dependency "oauth"
