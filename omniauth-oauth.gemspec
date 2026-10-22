@@ -14,8 +14,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "oauth"
   gem.add_dependency "rack", ">= 1.6.2", "< 4"
 
-  gem.executables   = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
-  gem.files         = `git ls-files`.split("\n")
+  gem.files         = Dir["lib/**/*", "sig/**/*.rbs", "LICENSE.md", "README.md"]
   gem.name          = "omniauth-oauth"
   gem.required_ruby_version = ">= 2.5"
   gem.require_paths = ["lib"]
