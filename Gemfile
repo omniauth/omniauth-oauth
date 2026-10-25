@@ -18,6 +18,13 @@ if RUBY_VERSION >= "3.3"
   gem "mutant-rspec", "~> 0.17.1", :require => false, :platforms => :mri
 end
 
+# Duel requires Ruby 3.4 or later. StackProf, for profiles of regressions,
+# runs on CRuby only.
+if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.4")
+  gem "duel"
+  gem "stackprof", :platforms => :mri
+end
+
 group :test do
   gem "rack-test"
   gem "rspec", "~> 3.2"
