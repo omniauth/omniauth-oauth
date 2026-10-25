@@ -1,4 +1,11 @@
+inherit_mode:
+  merge:
+    - Include
+
 AllCops:
+  # Duel's configuration is a dotfile, which RuboCop skips by default.
+  Include:
+    - .duel.rb
   TargetRubyVersion: 2.5
   NewCops: enable
   SuggestExtensions: false
