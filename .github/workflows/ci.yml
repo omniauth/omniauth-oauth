@@ -9,18 +9,24 @@ jobs:
       fail-fast: false
       matrix:
         ruby-version: ['2.5', '2.6', '2.7', '3.0', '3.1', '3.2', '3.3', '3.4', '4.0', 'head', 'jruby', 'jruby-head']
-    continue-on-error: ${{ matrix.ruby-version == 'jruby-head' || matrix.ruby-version == 'head' }}
     env:
       JRUBY_OPTS: '--debug'
     steps:
       - uses: actions/checkout@v7
-      - name: Set up Ruby
+      - id: ruby
+        name: Set up Ruby
+        continue-on-error: ${{ matrix.ruby-version == 'jruby-head' || matrix.ruby-version == 'head' }}
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true
-      - name: Run tests
+      - id: tests
+        name: Run tests
+        continue-on-error: ${{ matrix.ruby-version == 'jruby-head' || matrix.ruby-version == 'head' }}
         run: bundle exec rake spec rubocop steep
+      - name: Note an advisory failure
+        if: steps.ruby.outcome == 'failure' || steps.tests.outcome == 'failure'
+        run: echo "::warning title=Advisory failure::A step failed, but this job is allowed to fail, so the build still passes"
   mutant:
     runs-on: ubuntu-latest
     steps:
